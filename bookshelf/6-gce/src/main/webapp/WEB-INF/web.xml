@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright 2016 Google Inc.
+ Copyright 2019 Google LLC
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -17,45 +17,12 @@
       A web.xml is needed to explicitly set the order in which filters process requests. Any filters
       not included in web.xml will be loaded after filters listed below.
     -->
-    <!-- [START filters] -->
-    <filter-mapping>
-        <filter-name>DatastoreSessionFilter</filter-name>
-    </filter-mapping>
-    <!-- [END filters] -->
     <!-- [START welcome] -->
     <welcome-file-list>
-        <welcome-file>/books</welcome-file>
+        <welcome-file>/</welcome-file>
     </welcome-file-list>
     <!-- [END welcome] -->
     <!-- [START config] -->
-    <context-param>
-        <param-name>bookshelf.storageType</param-name>
-        <param-value>${bookshelf.storageType}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>bookshelf.bucket</param-name>
-        <param-value>${bookshelf.bucket}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>sql.urlRemote</param-name>
-        <param-value>jdbc:mysql://google/${sql.dbName}?cloudSqlInstance=${sql.instanceName}&amp;socketFactory=com.google.cloud.sql.mysql.SocketFactory&amp;user=${sql.userName}&amp;password=${sql.password}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>sql.urlLocal</param-name>
-        <param-value>jdbc:mysql://localhost/${sql.dbName}?user=${sql.userName}&amp;password=${sql.password}&amp;useSSL=false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>bookshelf.callback</param-name>
-        <param-value>${bookshelf.callback}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>bookshelf.clientID</param-name>
-        <param-value>${bookshelf.clientID}</param-value>
-    </context-param>
-    <context-param>
-        <param-name>bookshelf.clientSecret</param-name>
-        <param-value>${bookshelf.clientSecret}</param-value>
-    </context-param>
     <!-- [END config] -->
 </web-app>
 <!-- [END webxml] -->

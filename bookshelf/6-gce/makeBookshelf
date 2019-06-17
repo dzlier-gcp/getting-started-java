@@ -19,12 +19,13 @@ set -ex
 BUCKET=
 
 # [START useful]
-ZONE=us-central1-f
+REGION=us-central1
+ZONE=$REGION-f
 
 GROUP=frontend-group
 TEMPLATE=$GROUP-tmpl
 MACHINE_TYPE=g1-small
-IMAGE_FAMILY=debian-8
+IMAGE_FAMILY=debian-9
 IMAGE_PROJECT=debian-cloud
 STARTUP_SCRIPT=gce/startup-script.sh
 SCOPES="datastore,userinfo-email,logging-write,storage-full,cloud-platform"
@@ -35,7 +36,7 @@ MAX_INSTANCES=10
 TARGET_UTILIZATION=0.6
 
 SERVICE=frontend-web-service
-WAR=bookshelf-1.0-SNAPSHOT.war
+WAR=bookshelf-gce-1.0-SNAPSHOT.war
 # [END useful]
 
 function print_usage() {
@@ -111,7 +112,7 @@ down)
   ;;
 
 gce-many)
-  set -v
+  set -v +e
 #
 # Instance group setup
 #
@@ -184,13 +185,14 @@ gce-many)
 
 # [START create_backend_service]
   gcloud compute backend-services create $SERVICE \
-    --http-health-checks ah-health-check
+    --http-health-checks ah-health-check --global
 # [END create_backend_service]
 
 # [START add_backend_service]
   gcloud compute backend-services add-backend $SERVICE \
     --instance-group $GROUP \
-    --zone $ZONE
+    --instance-group-zone $ZONE
+    --global
 # [END add_backend_service]
 
 # Create a URL map and web Proxy. The URL map will send all requests to the
@@ -212,7 +214,7 @@ gce-many)
   gcloud compute forwarding-rules create $SERVICE-http-rule \
     --global \
     --target-http-proxy $SERVICE-proxy \
-    --port-range 80
+    --ports 80
 # [END create_forwarding_rule]
 
 #
@@ -229,17 +231,17 @@ gce-many)
   ;;
 
 down-many)
-  set -v
+  set -v +e
 # [START stop-gce]
-  gcloud compute instance-groups managed stop-autoscaling $GROUP --zone $ZONE
-  gcloud compute forwarding-rules delete $SERVICE-http-rule --global
-  gcloud compute target-http-proxies delete $SERVICE-proxy
-  gcloud compute url-maps delete $SERVICE-map
-  gcloud compute backend-services delete $SERVICE
-  gcloud compute http-health-checks delete ah-health-check
-  gcloud compute instance-groups managed delete $GROUP
-  gcloud compute firewall-rules delete allow-http-bookshelf
-  gcloud compute instance-templates delete $TEMPLATE
+  gcloud compute instance-groups managed stop-autoscaling $GROUP --zone $ZONE --quiet
+  gcloud compute forwarding-rules delete $SERVICE-http-rule --global --quiet
+  gcloud compute target-http-proxies delete $SERVICE-proxy --quiet
+  gcloud compute url-maps delete $SERVICE-map --quiet
+  gcloud compute backend-services delete $SERVICE --global --quiet
+  gcloud compute http-health-checks delete ah-health-check --quiet
+  gcloud compute instance-groups managed delete $GROUP --zone $ZONE --quiet
+  gcloud compute firewall-rules delete allow-http-bookshelf --quiet
+  gcloud compute instance-templates delete $TEMPLATE --quiet
 # [END stop-gce]
   ;;
 esac
