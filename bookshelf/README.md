@@ -1,62 +1,30 @@
-# Bookshelf - Shows Authentication and CRUD
-## Completed Application
+# Bookshelf App for Java on App Engine Standard Tutorial
+## Logging
 
-## Requirements
-* Java JDK 8
-* [Apache Maven](http://maven.apache.org) 3.3.9 or greater
-* [Install the Cloud SDK](https://cloud.google.com/sdk/)
-* `gcloud components update app-engine-java`
+Contains the code for using Cloud Firestore.
 
-## Before you begin
-* Create a cloud Project using [Cloud Developer Console](https://console.google.com)
-  * Enable Billing
-* Initialize the SDK; Be sure to set the correct project ID
-  * `gcloud init`
-* Create a Bucket for Image Storage
-  * `gsutil mb gs://<your-project-id>-images`
-  * `gsutil defacl set public-read gs://<your-project-id>-images`
-* Enable Required API's
-  * Cloud Console > API Manager > Overview > Google API's
-    * Google Cloud Datastore API
-    * Google Cloud Pub/Sub API
-    * Google Cloud Storage JSON API
-    * Stackdriver Logging API
-    * Google+ API
-* Create Web Credentials (To be changed later)
-  * Cloud Console > API Manager > Credentials > OAuth Client ID
-  * Web Application (Note - you may be asked to create an OAuth Conset screen, please do)
-  * Enable two authorized JavaScript origins
-    * `https://PROJECTID.appspot.com`  so that you can deploy later
-    * `http://localhost:8080` so that you can run locally
-  * Enable two authorized redirect URL's
-    * `https://PROJECTID.appspot.com/oauth2callback`
-    * `http://localhost:8080/oauth2callback`
-  * Be sure to get both the ClientID and ClientSecret.
-* Edit [pom.xml](pom.xml) It should look something like:
-    ```xml
-    <properties>
-      <bookshelf.storageType>datastore</bookshelf.storageType> <!-- datastore or cloudsql -->
-      <bookshelf.bucket></bookshelf.bucket>                    <!-- bucket you created earlier -->
+This is part of a [Bookshelf tutorial](https://cloud.google.com/java/getting-started/tutorial-app).
 
-      <callback.host>PROJECTID.appspot.com</callback.host>     <!-- Typically projectname.appspot.com -->
+Most users can get this running by updating the parameters in `pom.xml`. You'll
+also need to [create a bucket][create-bucket] in Google Cloud Storage, referred
+to below as `MY-BUCKET`.
 
-      <bookshelf.clientID></bookshelf.clientID>                <!-- for User Authentication -->
-      <bookshelf.clientSecret></bookshelf.clientSecret>        <!-- from g.co/cloud/console -->
+[create-bucket]: https://cloud.google.com/storage/docs/creating-buckets
 
-    </properties>
-    ```
+### Running Locally
 
-## Running locally
+    mvn -Plocal clean appengine:devserver -Dbookshelf.bucket=MY-BUCKET
 
-* In one of the subdirectories to this `README.md` file
+**Note**: If you run into an error about `Invalid Credentials`, you may have to run:
 
-    mvn -Plocal clean jetty:run-exploded
+    gcloud auth application-default login
 
-* Visit `http://localhost:8080`
+### Deploying to App Engine Standard
 
+* Deploy your App
 
-## Deploy to the App Engine flexible environment
+    mvn clean appengine:update -Dappengine.appId=<your-project-id> \
+        -Dappengine.version=bookshelf \
+        -Dbookshelf.bucket=MY-BUCKET
 
-    mvn clean gcloud:deploy
-
-* Visit `http://PROJECTID.appspot.com`.
+Visit it at http://bookshelf.<your-project-id>.appspot.com
